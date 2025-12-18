@@ -3,127 +3,316 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Заказать бота</title>
+  <title>SupportBot • Заказ бота</title>
+
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; margin:0; background:#0b0f1a; color:#e9eefc}
-    .wrap{max-width:520px; margin:0 auto; padding:16px}
-    .card{background:#111a2e; border:1px solid #1f2a44; border-radius:14px; padding:16px; box-shadow:0 8px 30px rgba(0,0,0,.25)}
-    h1{margin:0 0 8px; font-size:22px}
-    p{margin:0 0 14px; opacity:.9; line-height:1.4}
-    label{display:block; margin:10px 0 6px; font-size:13px; opacity:.9}
+    :root{
+      --bg1:#0b1020; --bg2:#070a14;
+      --card:#0f1730; --card2:#0c1327;
+      --stroke:#22305a; --text:#eef3ff; --muted:#aab6d6;
+      --acc:#2b70ff; --acc2:#22c55e; --warn:#fbbf24;
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+      --r:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:var(--text);
+      background: radial-gradient(1200px 600px at 20% 0%, #1a2a6a33, transparent 60%),
+                  radial-gradient(900px 500px at 90% 10%, #2b70ff22, transparent 55%),
+                  linear-gradient(180deg, var(--bg1), var(--bg2));
+      min-height:100vh;
+    }
+    .wrap{max-width:860px; margin:0 auto; padding:18px}
+    .top{
+      display:flex; gap:14px; align-items:center; justify-content:space-between;
+      padding:14px; border:1px solid var(--stroke); border-radius:var(--r);
+      background: linear-gradient(180deg, #101a38, #0a1022);
+      box-shadow: var(--shadow);
+    }
+    .brand{display:flex; gap:12px; align-items:center}
+    .logo{
+      width:46px; height:46px; border-radius:14px;
+      background: linear-gradient(135deg, #2b70ff, #7c3aed);
+      display:grid; place-items:center; font-weight:900;
+      box-shadow:0 10px 30px rgba(43,112,255,.25);
+      user-select:none;
+    }
+    .title{line-height:1.1}
+    .title b{font-size:16px}
+    .title div{font-size:12px; color:var(--muted); margin-top:4px}
+    .pill{
+      padding:8px 10px; border:1px solid var(--stroke);
+      border-radius:999px; background: #0b132b;
+      font-size:12px; color:var(--muted);
+    }
+    .grid{
+      display:grid; grid-template-columns: 1.2fr .8fr; gap:14px;
+      margin-top:14px;
+    }
+    @media (max-width:820px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, var(--card), var(--card2));
+      border-radius:var(--r);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:14px 14px 10px;
+      border-bottom:1px solid rgba(34,48,90,.6);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+    }
+    .card .hd h2{margin:0; font-size:16px}
+    .card .bd{padding:14px}
+    .muted{color:var(--muted); font-size:13px; line-height:1.4}
+
+    .bullets{display:grid; gap:10px; margin-top:12px}
+    .b{
+      display:flex; gap:10px; align-items:flex-start;
+      padding:10px; border:1px solid rgba(34,48,90,.65);
+      border-radius:14px; background:#0b132b;
+    }
+    .ic{
+      width:30px; height:30px; border-radius:10px;
+      background:#0f1730; border:1px solid rgba(34,48,90,.8);
+      display:grid; place-items:center;
+      flex:0 0 auto;
+    }
+    .b b{display:block; font-size:13px}
+    .b span{display:block; font-size:12px; color:var(--muted); margin-top:2px}
+
+    .plans{display:grid; gap:10px; margin-top:10px}
+    .plan{
+      padding:12px; border-radius:16px;
+      border:1px solid rgba(34,48,90,.65);
+      background:#0b132b;
+      display:flex; justify-content:space-between; align-items:center; gap:10px;
+    }
+    .plan .l b{font-size:13px}
+    .plan .l div{font-size:12px; color:var(--muted); margin-top:2px}
+    .price{
+      font-weight:900; padding:8px 10px;
+      border-radius:999px; border:1px solid rgba(34,48,90,.8);
+      background: rgba(43,112,255,.12);
+    }
+
+    label{display:block; margin:10px 0 6px; font-size:12px; color:var(--muted)}
     input, textarea, select{
-      width:100%; box-sizing:border-box; padding:12px;
-      border-radius:12px; border:1px solid #233253; background:#0c1324; color:#e9eefc;
+      width:100%; padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(34,48,90,.8);
+      background:#071024; color:var(--text);
       outline:none;
     }
-    textarea{min-height:96px; resize:vertical}
+    textarea{min-height:92px; resize:vertical}
     .row{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-    .hint{font-size:12px; opacity:.75; margin-top:8px}
+    @media (max-width:520px){ .row{grid-template-columns:1fr} }
+
     .btn{
-      width:100%; margin-top:14px; padding:12px 14px;
-      border-radius:12px; border:0; cursor:pointer;
-      background:#2b70ff; color:white; font-weight:700; font-size:15px;
+      width:100%; margin-top:12px; padding:12px 14px;
+      border-radius:14px; border:0; cursor:pointer;
+      background: linear-gradient(135deg, var(--acc), #7c3aed);
+      color:white; font-weight:900; font-size:15px;
+      box-shadow:0 12px 40px rgba(43,112,255,.25);
     }
     .btn:disabled{opacity:.6; cursor:not-allowed}
-    .ok{margin-top:10px; padding:10px 12px; border-radius:12px; background:#0f2a1a; border:1px solid #1f6b3a}
-    .err{margin-top:10px; padding:10px 12px; border-radius:12px; background:#2a1010; border:1px solid #6b1f1f}
-    .badge{display:inline-block; padding:6px 10px; border-radius:999px; background:#0c1324; border:1px solid #233253; font-size:12px; opacity:.9}
+    .mini{
+      width:100%; margin-top:10px; padding:10px 12px;
+      border-radius:14px; border:1px solid rgba(34,48,90,.8);
+      background:#0b132b; color:var(--muted); font-size:12px;
+    }
+    .ok{border-color:#1f6b3a; background:#0f2a1a; color:#bff5d6}
+    .err{border-color:#6b1f1f; background:#2a1010; color:#ffd0d0}
+
+    .footer{
+      margin-top:14px; text-align:center;
+      color:var(--muted); font-size:12px;
+      opacity:.95;
+    }
+    .tag{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(34,48,90,.8);
+      background:#0b132b; color:var(--muted); font-size:12px;
+    }
+    .dot{width:7px; height:7px; border-radius:99px; background:var(--acc2)}
   </style>
 </head>
+
 <body>
   <div class="wrap">
-    <div class="card">
-      <div class="badge">SupportBot • Заказ бота</div>
-      <h1 style="margin-top:10px;">Оставь заявку</h1>
-      <p>Заполни форму — заявка улетит админу. Ответ придёт в Telegram.</p>
 
-      <div class="row">
-        <div>
-          <label>Твоё имя</label>
-          <input id="name" placeholder="Например: Коля" />
+    <div class="top">
+      <div class="brand">
+        <div class="logo">SB</div>
+        <div class="title">
+          <b>SupportBot — боты под заказ</b>
+          <div>Заявка за 30 секунд • ответ в Telegram</div>
         </div>
-        <div>
-          <label>Бюджет (примерно)</label>
-          <select id="budget">
-            <option value="Не знаю">Не знаю</option>
-            <option value="до 20$">до 20$</option>
-            <option value="20–50$">20–50$</option>
-            <option value="50–100$">50–100$</option>
-            <option value="100$+">100$+</option>
-          </select>
+      </div>
+      <div class="pill">⚡ Быстро • 🛠 Под ключ • 🌐 Mini App</div>
+    </div>
+
+    <div class="grid">
+      <!-- Левая колонка: продажа -->
+      <div class="card">
+        <div class="hd">
+          <h2>Что я делаю</h2>
+          <span class="tag"><span class="dot"></span> онлайн</span>
+        </div>
+        <div class="bd">
+          <div class="muted">
+            Создаю Telegram-ботов и Mini Apps: приём заявок, поддержка, меню, админ-функции.
+            Хочешь “как у магазинов/сервисов” — сделаю.
+          </div>
+
+          <div class="bullets">
+            <div class="b">
+              <div class="ic">📩</div>
+              <div><b>Приём заявок</b><span>анкеты, формы, ответы, пересылка админу</span></div>
+            </div>
+            <div class="b">
+              <div class="ic">🧩</div>
+              <div><b>Кнопки и меню</b><span>удобная навигация, команды, сценарии</span></div>
+            </div>
+            <div class="b">
+              <div class="ic">🌐</div>
+              <div><b>Mini App</b><span>современный интерфейс прямо в Telegram</span></div>
+            </div>
+          </div>
+
+          <div style="height:12px"></div>
+          <h2 style="font-size:14px; margin:0 0 8px;">Тарифы (пример)</h2>
+          <div class="plans">
+            <div class="plan">
+              <div class="l">
+                <b>Старт</b>
+                <div>простое меню + заявка</div>
+              </div>
+              <div class="price">от 20$</div>
+            </div>
+            <div class="plan">
+              <div class="l">
+                <b>Стандарт</b>
+                <div>анкета + админ-уведомления</div>
+              </div>
+              <div class="price">от 50$</div>
+            </div>
+            <div class="plan">
+              <div class="l">
+                <b>Pro</b>
+                <div>Mini App + оплата + база</div>
+              </div>
+              <div class="price">100$+</div>
+            </div>
+          </div>
+
+          <div class="footer">
+            💡 Оплату подключим позже (можно начать с ручной оплаты: USDT/перевод).
+          </div>
         </div>
       </div>
 
-      <label>Что за бот нужен?</label>
-      <input id="purpose" placeholder="Поддержка, магазин, игра, заявки, админка..." />
+      <!-- Правая колонка: форма -->
+      <div class="card" id="formCard">
+        <div class="hd">
+          <h2>Оставить заявку</h2>
+          <div class="pill" style="font-size:12px;">⌛ 30 сек</div>
+        </div>
+        <div class="bd">
+          <div class="row">
+            <div>
+              <label>Имя</label>
+              <input id="name" placeholder="Например: Коля" />
+            </div>
+            <div>
+              <label>Бюджет</label>
+              <select id="budget">
+                <option value="Не знаю">Не знаю</option>
+                <option value="до 20$">до 20$</option>
+                <option value="20–50$">20–50$</option>
+                <option value="50–100$">50–100$</option>
+                <option value="100$+">100$+</option>
+              </select>
+            </div>
+          </div>
 
-      <label>Какие функции?</label>
-      <textarea id="features" placeholder="Например: меню, анкета, рассылка, база пользователей, оплата..."></textarea>
+          <label>Что за бот нужен?</label>
+          <input id="purpose" placeholder="Поддержка, магазин, игра, заявки..." />
 
-      <label>Контакт (не обязательно)</label>
-      <input id="contact" placeholder="@username или номер (если хочешь)" />
+          <label>Какие функции нужны?</label>
+          <textarea id="features" placeholder="Меню, анкета, рассылка, админка, оплата..."></textarea>
 
-      <button id="sendBtn" class="btn">Отправить заявку</button>
+          <label>Контакт (не обязательно)</label>
+          <input id="contact" placeholder="@username или номер" />
 
-      <div id="msg"></div>
-      <div class="hint">Если кнопка не отправляет — открой Mini App внутри Telegram и попробуй снова.</div>
+          <button id="sendBtn" class="btn">📩 Отправить заявку</button>
+          <div id="msg" class="mini" style="display:none"></div>
+
+          <div class="mini" style="margin-top:12px;">
+            ✅ После отправки заявка придёт админу. Ответ будет в Telegram.
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
     const tg = window.Telegram?.WebApp;
 
-    function show(type, text) {
-      const el = document.getElementById("msg");
-      el.className = type === "ok" ? "ok" : "err";
+    function byId(id){ return document.getElementById(id); }
+    function val(id){ return (byId(id).value || "").trim(); }
+
+    function show(type, text){
+      const el = byId("msg");
+      el.style.display = "block";
+      el.className = "mini " + (type === "ok" ? "ok" : "err");
       el.textContent = text;
     }
 
-    function getVal(id){ return (document.getElementById(id).value || "").trim(); }
-
-    // Под Telegram чуть красивее
     if (tg) {
       tg.ready();
       tg.expand();
+      // красиво под телеграм, если поддерживается
+      try { tg.MainButton.hide(); } catch(e){}
     }
 
-    document.getElementById("sendBtn").addEventListener("click", () => {
-      const name = getVal("name");
-      const purpose = getVal("purpose");
-      const features = getVal("features");
-      const budget = getVal("budget");
-      const contact = getVal("contact");
+    byId("sendBtn").addEventListener("click", () => {
+      const purpose = val("purpose");
+      const features = val("features");
 
       if (!purpose || !features) {
-        show("err", "Заполни хотя бы: «Что за бот нужен?» и «Какие функции?»");
+        show("err", "Заполни хотя бы «Что за бот нужен?» и «Какие функции нужны?»");
         return;
       }
 
       const payload = {
         type: "order",
-        name: name || null,
-        budget,
+        name: val("name") || null,
+        budget: val("budget") || "Не знаю",
         purpose,
         features,
-        contact: contact || null,
+        contact: val("contact") || null,
         ts: new Date().toISOString()
       };
 
       if (!tg) {
-        show("err", "Это должно быть открыто внутри Telegram (WebApp). В браузере напрямую отправка не сработает.");
+        show("err", "Открой это внутри Telegram (Mini App).");
         return;
       }
 
-      // Отправка данных в бота
       try {
-        document.getElementById("sendBtn").disabled = true;
+        byId("sendBtn").disabled = true;
         tg.sendData(JSON.stringify(payload));
-        show("ok", "✅ Заявка отправлена! Можно закрыть окно — админ ответит в Telegram.");
-        // Можно автозакрыть через пару секунд:
-        setTimeout(() => tg.close(), 1200);
+        show("ok", "✅ Заявка отправлена! Можно закрыть — админ ответит в Telegram.");
+        setTimeout(() => tg.close(), 900);
       } catch (e) {
-        document.getElementById("sendBtn").disabled = false;
+        byId("sendBtn").disabled = false;
         show("err", "Не удалось отправить. Попробуй ещё раз.");
       }
     });
