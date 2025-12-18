@@ -240,6 +240,14 @@
             </div>
           </div>
 
+          <!-- ✅ ДОБАВЛЕНО: выбор тарифа для Stars -->
+          <label>Тариф</label>
+          <select id="plan">
+            <option value="start">Старт</option>
+            <option value="standard">Стандарт</option>
+            <option value="pro">Pro</option>
+          </select>
+
           <label>Что за бот нужен?</label>
           <input id="purpose" placeholder="Поддержка, магазин, игра, заявки..." />
 
@@ -250,6 +258,10 @@
           <input id="contact" placeholder="@username или номер" />
 
           <button id="sendBtn" class="btn">📩 Отправить заявку</button>
+
+          <!-- ✅ ДОБАВЛЕНО: кнопка Stars -->
+          <button id="payBtn" class="btn" style="margin-top:10px;">⭐ Оплатить Stars</button>
+
           <div id="msg" class="mini" style="display:none"></div>
 
           <div class="mini" style="margin-top:12px;">
@@ -279,6 +291,7 @@
       try { tg.MainButton.hide(); } catch(e){}
     }
 
+    // ✅ Обычная заявка (как было) + ДОБАВЛЕНО поле plan
     byId("sendBtn").addEventListener("click", () => {
       const purpose = val("purpose");
       const features = val("features");
@@ -292,6 +305,7 @@
         type: "order",
         name: val("name") || null,
         budget: val("budget") || "Не знаю",
+        plan: val("plan") || "start",
         purpose,
         features,
         contact: val("contact") || null,
@@ -311,6 +325,23 @@
       } catch (e) {
         byId("sendBtn").disabled = false;
         show("err", "Не удалось отправить. Попробуй ещё раз.");
+      }
+    });
+
+    // ✅ ДОБАВЛЕНО: запрос Stars-оплаты в бота
+    byId("payBtn").addEventListener("click", () => {
+      const plan = val("plan") || "start";
+
+      if (!tg) {
+        show("err", "Открой это внутри Telegram (Mini App).");
+        return;
+      }
+
+      try {
+        tg.sendData(JSON.stringify({ type: "pay_stars", plan }));
+        show("ok", "⭐ Сейчас бот пришлёт счёт Stars в чат. Оплати там.");
+      } catch (e) {
+        show("err", "Не удалось запустить оплату. Попробуй ещё раз.");
       }
     });
   </script>
